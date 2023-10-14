@@ -1,2 +1,5 @@
-package com.danbi.recruit.domain;public enum RecruitStatus {
+package com.danbi.recruit.domain;
+
+public enum RecruitStatus {
+    VALID, INVALID
 }
