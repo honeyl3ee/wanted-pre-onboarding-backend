@@ -3,8 +3,10 @@ package com.danbi.recruit.service;
 import com.danbi.recruit.domain.Company;
 import com.danbi.recruit.domain.Recruit;
 import com.danbi.recruit.domain.RecruitStatus;
+import com.danbi.recruit.domain.Users;
 import com.danbi.recruit.repository.CompanyRepository;
 import com.danbi.recruit.repository.RecruitRepository;
+import com.danbi.recruit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,7 @@ public class RecruitService {
 
     private final RecruitRepository recruitRepository;
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public Long post(Long companyId, Long reward, String content, String position, String techStack) {
@@ -33,6 +36,16 @@ public class RecruitService {
         Recruit recruit = recruitRepository.findOne(recruitId);
         recruit.delete();
     }
+
+    @Transactional
+    public void apply(Long recruitId, Long userId) throws Exception {
+        Recruit recruit = recruitRepository.findOne(recruitId);
+        Users user = userRepository.findOne(userId);
+        if(user.getRecruit() != null)
+            throw new IllegalStateException("이미 지원한 공고가 존재합니다.");
+        recruit.setUsers(user);
+    }
+
 
     public Recruit findRecruit(Long recruitId) {
         return recruitRepository.findOne(recruitId);
