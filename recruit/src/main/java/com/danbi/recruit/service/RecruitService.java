@@ -24,9 +24,7 @@ public class RecruitService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long post(Long companyId, Long reward, String content, String position, String techStack) {
-        Company company = companyRepository.findOne(companyId);
-        Recruit recruit = Recruit.createRecruit(company, reward, content, position, techStack);
+    public Long post(Recruit recruit) {
         recruitRepository.save(recruit);
         return recruit.getId();
     }
