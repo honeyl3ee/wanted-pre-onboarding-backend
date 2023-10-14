@@ -22,17 +22,16 @@ class CompanyServiceTest {
 
     @Autowired
     EntityManager em;
-    @Autowired CompanyRepository companyRepository;
     @Autowired CompanyService companyService;
 
     @Test
     public void 회사조회() throws Exception {
         //given
         Company company = createCompany("원티드", "한국", "서울");
-        companyRepository.save(company);
+        companyService.join(company);
 
         //when
-        Company findCompany = companyRepository.findOne(company.getId());
+        Company findCompany = companyService.findOne(company.getId());
 
 
         //then
@@ -49,19 +48,28 @@ class CompanyServiceTest {
         Company company2 = createCompany("원티드", "한국", "서울");
 
         //when
-        companyService.save(company1);
+        companyService.join(company1);
 
         //then
-        assertThrows(IllegalStateException.class, () -> companyService.save(company2), "중복 에러가 발생해야 합니다.");
+        assertThrows(IllegalStateException.class, () -> companyService.join(company2), "중복 에러가 발생해야 합니다.");
     }
 
     @Test
     public void 회사_목록_조회() throws Exception {
-        //given
+        // given
+        Company company1 = createCompany("company1", "korea", "seoul");
+        Company company2 = createCompany("company2", "korea", "busan");
+        companyService.join(company1);
+        companyService.join(company2);
+        // when
+        int size = companyService.findCompanies().size();
+        String name = companyService.findOne(company1.getId()).getName();
+        String country = companyService.findOne(company1.getId()).getCountry();
+        // then
+        assertEquals(2, size, "조회된 데이터 개수와 실행시 만들어지는 데이터의 숫자가 같아야합니다.");
+        assertEquals("company1", name, "조회된 데이터의 name과 실행시 만들어지는 데이터의 name이 같아야 합니다.");
+        assertEquals("korea", country, "조회된 데이터 region와 실행시 만들어지는 데이터 region이 같아야 합니다.");
 
-        //when
-
-        //then
     }
 
     public Company createCompany(String name, String country, String city) {
@@ -69,7 +77,6 @@ class CompanyServiceTest {
         company.setName(name);
         company.setCountry(country);
         company.setCity(city);
-//        em.persist(company);
         return company;
     }
 }
