@@ -16,7 +16,7 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
 
     @Transactional
-    public Long save(Company company) {
+    public Long join(Company company) {
         validatedDuplicateMember(company);
         companyRepository.save(company);
         return company.getId();
