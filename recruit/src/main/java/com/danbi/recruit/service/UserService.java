@@ -17,8 +17,9 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void join(Users user) {
+    public Long join(Users user) {
         userRepository.save(user);
+        return user.getId();
     }
 
     public Users findUser(Long userId) {
