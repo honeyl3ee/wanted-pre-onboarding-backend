@@ -1,8 +1,8 @@
 package com.danbi.recruit.service;
 
+import com.danbi.recruit.DTO.RecruitDTO;
 import com.danbi.recruit.domain.Company;
 import com.danbi.recruit.domain.Recruit;
-import com.danbi.recruit.domain.RecruitStatus;
 import com.danbi.recruit.domain.Users;
 import com.danbi.recruit.repository.RecruitRepository;
 import jakarta.persistence.EntityManager;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,8 @@ class RecruitServiceTest {
     public void 채용공고등록() throws Exception {
         //given
         Company company = createCompany("원티드", "한국", "부산");
-        Long recruitId = recruitService.post(company.getId(), 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Recruit recruit = Recruit.createRecruit(company, 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Long recruitId = recruitService.post(recruit);
 
         //when
         Recruit findRecruit = recruitRepository.findOne(recruitId);
@@ -42,28 +44,46 @@ class RecruitServiceTest {
         assertEquals(recruitId, findRecruit.getId());
         assertEquals(company.getId(), findRecruit.getCompany().getId());
         assertEquals("백엔드", findRecruit.getPosition());
-        assertEquals(RecruitStatus.VALID, findRecruit.getStatus());
     }
 
     @Test
     public void 채용공고삭제() throws Exception {
         //given
         Company company = createCompany("원티드", "한국", "부산");
-        Long recruitId = recruitService.post(company.getId(), 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Recruit recruit = Recruit.createRecruit(company, 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Long recruitId = recruitService.post(recruit);
 
         //when
         recruitService.delete(recruitId);
-        Recruit findRecruit = recruitService.findRecruit(recruitId);
 
         //then
-        assertEquals(RecruitStatus.INVALID, findRecruit.getStatus());
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> recruitService.findRecruit(recruitId), "존재하지 않는 채용공고 조회 시 에러가 발생해야 한다.");
+    }
+
+    @Test
+    public void 채용공고지원_삭제() throws Exception {
+        //given
+        Company company = createCompany("원티드", "한국", "부산");
+        Recruit recruit = Recruit.createRecruit(company, 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Long recruitId = recruitService.post(recruit);
+        Users user = createUser("kim");
+        Recruit findRecruit = recruitService.findRecruit(recruitId);
+
+        //when
+        recruitService.apply(recruitId, user.getId());
+        recruitService.delete(recruitId);
+
+        //then
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> recruitService.findRecruit(recruitId), "존재하지 않는 채용공고 조회 시 에러가 발생해야 한다.");
+        assertEquals(user.getRecruit(), findRecruit);
     }
 
     @Test
     public void 채용공고지원() throws Exception {
         //given
         Company company = createCompany("원티드", "한국", "부산");
-        Long recruitId = recruitService.post(company.getId(), 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Recruit recruit = Recruit.createRecruit(company, 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Long recruitId = recruitService.post(recruit);
         Users user = createUser("kim");
         Recruit findRecruit = recruitService.findRecruit(recruitId);
 
@@ -73,16 +93,29 @@ class RecruitServiceTest {
         //then
         assertTrue(findRecruit.getUsers().contains(user));
         assertEquals(1, findRecruit.getUsers().size());
+        assertThrows(IllegalStateException.class, () -> recruitService.apply(findRecruit.getId(), user.getId()), "중복 지원 시 에러가 발생해야 한다.");
     }
 
-//    @Test
-//    public void 공고조회() throws Exception {
-//        //given
-//
-//        //when
-//
-//        //then
-//    }
+    @Test
+    public void 채용공고_수정() throws Exception {
+        //given
+        Company company = createCompany("원티드", "한국", "부산");
+        Recruit recruit = Recruit.createRecruit(company, 1000000L, "백엔드 개발자를 모집합니다.", "백엔드", "java");
+        Long recruitId = recruitService.post(recruit);
+
+        //when
+        RecruitDTO.UpdateRecruitRequest request = new RecruitDTO.UpdateRecruitRequest("프론트", 1000000L, "javascript", "프론트엔드 개발자를 모집합니다.");
+        recruitService.update(recruitId, request);
+
+        Recruit findRecruit = recruitRepository.findOne(recruitId);
+
+        //then
+        assertEquals(findRecruit.getId(), recruitId);
+        assertEquals("프론트", findRecruit.getPosition());
+        assertEquals(recruit.getCompany().getId(), findRecruit.getCompany().getId());
+    }
+
+    //검색 서비스 테스트
 
     public Company createCompany(String name, String country, String city) {
         Company company = new Company();
