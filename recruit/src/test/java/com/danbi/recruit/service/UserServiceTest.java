@@ -51,6 +51,6 @@ public class UserServiceTest {
         List<Users> allUsers = userService.findAllUsers();
 
         //then
-        assertEquals(3, allUsers.size());
+        assertEquals(5, allUsers.size());
     }
 }
