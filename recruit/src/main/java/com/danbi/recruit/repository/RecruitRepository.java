@@ -58,14 +58,4 @@ public class RecruitRepository {
 
         return Optional.ofNullable(results);
     }
-
-    //public Optional<List<Recruit>> searchRecruit() {
-//        return em.createQuery("select o from Order o join o.member m" + " where o.status = :status" +
-//        " and m.name like :name", Orders.class)
-//                .setParameter("status", orderSearch.getOrderStatus())
-//                .setParameter("name", orderSearch.getMemberName())
-//                .setMaxResults(1000)
-//                .getResultList();
-//    }
-
 }
