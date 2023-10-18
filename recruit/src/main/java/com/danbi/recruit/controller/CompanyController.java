@@ -5,11 +5,15 @@ import com.danbi.recruit.repository.CompanyRepository;
 import com.danbi.recruit.service.CompanyService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +31,11 @@ public class CompanyController {
         Long companyId = companyService.join(company);
 
         return new CreateCompanyResponse(companyId);
+    }
+
+    @GetMapping("/api/companies")
+    public List<Company> readAllCompanies() {
+        return companyService.findCompanies();
     }
 
     @Data
@@ -49,4 +58,6 @@ public class CompanyController {
             this.id = id;
         }
     }
+
+
 }
