@@ -1,12 +1,13 @@
 package com.danbi.recruit.service;
 
+import com.danbi.recruit.DTO.RecruitDTO;
 import com.danbi.recruit.domain.Company;
 import com.danbi.recruit.domain.Recruit;
-import com.danbi.recruit.domain.RecruitStatus;
 import com.danbi.recruit.domain.Users;
 import com.danbi.recruit.repository.CompanyRepository;
 import com.danbi.recruit.repository.RecruitRepository;
 import com.danbi.recruit.repository.UserRepository;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,6 @@ import java.util.Optional;
 public class RecruitService {
 
     private final RecruitRepository recruitRepository;
-    private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -30,18 +30,29 @@ public class RecruitService {
     }
 
     @Transactional
-    public void delete(Long recruitId) {
-        Recruit recruit = recruitRepository.findOne(recruitId);
-        recruit.delete();
+    public Long update(Long id, RecruitDTO.UpdateRecruitRequest request) {
+        Recruit recruit = recruitRepository.findOne(id);
+        recruit.setContent(request.getContent());
+        recruit.setReward(request.getReward());
+        recruit.setPosition(request.getPosition());
+        recruit.setTechStack(request.getTechStack());
+        return recruit.getId();
     }
 
     @Transactional
-    public void apply(Long recruitId, Long userId) throws Exception {
+    public void delete(Long recruitId) {
+        Recruit recruit = recruitRepository.findOne(recruitId);
+        recruitRepository.delete(recruit);
+    }
+
+    @Transactional
+    public Long apply(Long recruitId, Long userId){
         Recruit recruit = recruitRepository.findOne(recruitId);
         Users user = userRepository.findOne(userId);
         if(user.getRecruit() != null)
             throw new IllegalStateException("이미 지원한 공고가 존재합니다.");
         recruit.setUsers(user);
+        return recruitId;
     }
 
 
@@ -53,16 +64,8 @@ public class RecruitService {
         return recruitRepository.findAll();
     }
 
-    //상세페이지 반환
-
-    //검색
-//    public Optional<List<Recruit>> searchRecruit() {
-//        return em.createQuery("select o from Order o join o.member m" + " where o.status = :status" + " and m.name like :name", Orders.class)
-//                .setParameter("status", orderSearch.getOrderStatus())
-//                .setParameter("name", orderSearch.getMemberName())
-//                .setMaxResults(1000)
-//                .getResultList();
-//    }
-
+    public Optional<List<Recruit>> searchRecruit(String keyword) {
+        return recruitRepository.searchRecruit(keyword);
+    }
 
 }
