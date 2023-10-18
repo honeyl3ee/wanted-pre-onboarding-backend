@@ -15,6 +15,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
@@ -115,7 +118,37 @@ class RecruitServiceTest {
         assertEquals(recruit.getCompany().getId(), findRecruit.getCompany().getId());
     }
 
-    //검색 서비스 테스트
+    @Test
+    public void 채용공고_조회() throws Exception {
+
+        //when
+        Recruit recruit = recruitService.findRecruit(1L);
+        Recruit findRecruit = recruitRepository.findOne(1L);
+
+        //then
+        assertEquals(recruit, findRecruit);
+    }
+
+    @Test
+    public void 채용공고_목록_조회() throws Exception {
+
+        //when
+        List<Recruit> recruits = recruitService.findRecruits();
+
+        //then
+        assertEquals(4, recruits.size());
+    }
+
+    @Test
+    public void 채용공고_키워드_검색() throws Exception {
+        //when
+        Optional<List<Recruit>> recruits = recruitService.searchRecruit("flutter");
+
+        //given
+        assertTrue(recruits.isPresent());
+        assertEquals(1, recruits.get().size());
+    }
+
 
     public Company createCompany(String name, String country, String city) {
         Company company = new Company();
