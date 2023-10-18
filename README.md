@@ -33,12 +33,12 @@
     요구사항 분석을 토대로 임시로 만든 엔티티에 대한 관계도(테이블 설계)를 했습니다.
 ![대체 텍스트(alt)](https://documents.lucid.app/documents/259f7bb5-eba5-4e98-bfbe-44d027fbc4b0/pages/0_0?a=432&x=633&y=333&w=1015&h=154&store=1&accept=image%2F*&auth=LCA%20ae6f567072a3d67e1d5290d1e0a983139e1d9ff9a14e27a6c02657edf90e87b8-ts%3D1697020078 "이미지 설명(title)")
 
-![대체 텍스트(alt)](img_1.png)
+![대체 텍스트(alt)](img1.png)
 
 #### 도메인 모델 수정
     작업 중 지원이라는 모델은 필요하지 않은 것 같아서 삭제후 관계를 다시 정리 했습니다.
 
-![대체 텍스트(alt)](img.png)
+![대체 텍스트(alt)](img2.png)
 
 
 
