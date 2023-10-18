@@ -3,6 +3,7 @@ package com.danbi.recruit.repository;
 import com.danbi.recruit.domain.Users;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +19,10 @@ public class UserRepository {
     }
 
     public Users findOne(Long userId) {
-        return em.find(Users.class, userId);
+        Users findUser = em.find(Users.class, userId);
+        if (findUser == null)
+            throw new InvalidDataAccessApiUsageException("존재하지 않는 회사 id 입니다.");
+        return findUser;
     }
 
     public List<Users> findAll() {
