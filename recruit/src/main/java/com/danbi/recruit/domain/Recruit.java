@@ -24,7 +24,7 @@ public class Recruit {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @OneToMany(mappedBy = "recruit")
+    @OneToMany(mappedBy = "recruit", cascade = CascadeType.ALL)
     private List<Users> users = new ArrayList<>();
 
     private String position;
@@ -34,9 +34,6 @@ public class Recruit {
     private String techStack;
 
     private  String content;
-
-    @Enumerated(EnumType.STRING)
-    private RecruitStatus status;
 
     //연관관계 메서드//
     public void setCompany(Company company) {
@@ -57,14 +54,6 @@ public class Recruit {
         recruit.setContent(content);
         recruit.setPosition(position);
         recruit.setTechStack(techStack);
-        recruit.setStatus(RecruitStatus.VALID);
         return recruit;
     }
-
-    //비즈니스 로직//
-    public void delete() {
-        setStatus(RecruitStatus.INVALID);
-    }
-
-
 }

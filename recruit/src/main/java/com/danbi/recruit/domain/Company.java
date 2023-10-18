@@ -17,7 +17,7 @@ public class Company {
     @Column(name = "company_id")
     private Long id;
 
-    @OneToMany(mappedBy = "company")
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<Recruit> recruits = new ArrayList<>();
 
     private String name;
